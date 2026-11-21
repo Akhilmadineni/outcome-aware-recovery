@@ -1,0 +1,65 @@
+
+digraph G {
+  graph [rankdir=TB, fontname="Helvetica", fontsize=15, nodesep=0.16, ranksep=0.15, pad=0.08,
+         newrank=true, compound=true, splines=true];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=15, margin="0.06,0.03",
+         color="#6b6b6b", fillcolor="#efefef", penwidth=1.0];
+  edge  [color="#555555", arrowsize=0.7, fontname="Helvetica", fontsize=14];
+
+  subgraph cluster_data {
+    label="1  Data layer"; labeljust=l; style="rounded,filled"; fillcolor="#f5f5f5"; color="#bdbdbd";
+    resp [label="Ambiguous call:\nresponse, elapsed,\ntimeout, retries"];
+    evid [label="Evidence: describe,\nasync status,\naudit log, tags"];
+    { rank=same; resp; evid; }
+  }
+
+  subgraph cluster_prep {
+    label="2  Pre-processing"; labeljust=l; style="rounded,filled";
+    fillcolor="#eef3f8"; color="#b5c6d8";
+    clean [label="Winsorise,\nimpute + flags"];
+    feat  [label="Ratio features\n→ vector xᵢ"];
+    { rank=same; clean; feat; }
+  }
+
+  subgraph cluster_prop {
+    label="3  Proposed CS-CART"; labeljust=l; style="rounded,filled";
+    fillcolor="#fbeeee"; color="#d9a3a0";
+    node [fillcolor="#f6d5d3", color="#c0392b"];
+    cost  [label="Cost Cᵢ(k,a)\nEq. (1)"];
+    wts   [label="wᵢ = rᵢ^γ\nEq. (3)"];
+    grid  [label="Pick (D,\nn_min, γ)"];
+    grow  [label="Weighted-Gini\nCART, Eq. (4)"];
+    post  [label="Leaf posterior\np̂ℓ(k), Eq. (5)"];
+    icv   [label="Inner-CV\ncost, Eq. (7)"];
+    done  [shape=diamond, style="filled", label="grid\ndone?", fontsize=14, margin="0.02,0.02"];
+    bayes [label="â = argmin Σ p̂C\nEq. (6)", penwidth=1.6];
+    act   [shape=diamond, style="filled", label="â =\nWait?", fontsize=14, margin="0.02,0.02"];
+    exec  [label="Execute â\n(Mark … Abort)"];
+    { rank=same; cost; wts; }
+    { rank=same; grid; grow; }
+    grid -> grow [style=invis];
+    { rank=same; icv; post; }
+    icv -> post [style=invis];
+    { rank=same; done; bayes; }
+    { rank=same; act; exec; }
+  }
+
+  subgraph cluster_eval {
+    label="4  Evaluation (5-fold CV)"; labeljust=l; style="rounded,filled";
+    fillcolor="#f3f3f3"; color="#bdbdbd";
+    base  [label="Retry-always, fail-\nfast, reconcile, LR"];
+    met   [label="Cost, incidents,\nF1, ECE Eq. (8)"];
+    { rank=same; base; met; }
+  }
+
+  resp -> clean; evid -> feat; clean -> feat;
+  feat -> cost;
+  clean -> cost [style=invis];
+  cost -> wts; wts -> grow; grid -> grow; grow -> post; post:w -> icv:e [constraint=false]; icv -> done;
+  grid:sw -> done:w [dir=back, xlabel="no ", weight=0];
+  done -> bayes [label="yes "];
+  bayes -> act; act -> exec [label="no"];
+  act -> evid [label=" yes:\n re-poll", constraint=false, style=dashed, color="#c0392b",
+               fontcolor="#c0392b"];
+  exec -> met; base -> met;
+}

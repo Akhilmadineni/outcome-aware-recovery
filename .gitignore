@@ -1,0 +1,35 @@
+# Operating-system metadata
+.DS_Store
+._*
+__MACOSX/
+Thumbs.db
+
+# Python bytecode, environments and local tooling
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.coverage
+htmlcov/
+
+# Local credentials and machine settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+.vscode/
+.idea/
+
+# Transient run and editor files
+*.log
+run_log.txt
+*.tmp
+*.swp
+*~

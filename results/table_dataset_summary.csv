@@ -1,0 +1,10 @@
+Property,Value
+Calls (rows) / columns,"15,000 / 25"
+Period,2025-01-01 to 2026-06-30
+Services / providers / regions / operations,7 / 3 / 4 / 10
+Response classes,7 (timeout 30.4%)
+Async ops / idempotency key sent,60.2% / 59.5%
+Describe issued / audit event seen,80.1% / 47.0%
+Missing (payload / congestion / audit lag),1.3% / 2.4% / 2.4%
+Outcome: applied / not / partial / duplicate,56.3% / 23.8% / 10.2% / 9.6%
+Action: Mark / Retry / Dedup / Comp / Wait,56.3% / 23.8% / 9.6% / 6.5% / 3.8%
